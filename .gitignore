@@ -1,0 +1,8 @@
+.env/
+
+*.safetensors
+*.bin
+*.pth
+
+*.png
+*.jpg
