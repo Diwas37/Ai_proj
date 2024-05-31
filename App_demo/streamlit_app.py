@@ -28,20 +28,23 @@ def configure_sidebar() -> None:
     """
     with st.sidebar:
         with st.form("my_form"):
-            option_gen = st.radio("Select an option", ("Interior", "Architect"))
+            option_gen = st.radio("Generation option", ("Interior", "Architect"))
             st.session_state.option_gen = option_gen
 
             st.info("**Start here ↓**", icon="👋🏾")
             
             prompt = st.text_area(
-                ":orange[**Enter prompt: Typing your prompt✍🏾**]",
+                ":orange[**Enter prompt: ✍🏾**]",
                 value="An astronaut riding a rainbow unicorn, cinematic, dramatic",
                 height=200)
             negative_prompt = st.text_area(":orange[**Negative prompt 🙅🏽‍♂️**]",
                                            value="the absolute worst quality, distorted features",
                                            help="This is a negative prompt, basically type what you don't want to see in the generated image",
                                            height=150)
+            imgae_controlnet = st.file_uploader("Upload img2img (optional)", type=["jpg", "jpeg", "png"], key="img2img_uploader")
+            image_inpainting = st.file_uploader("Upload inpainting (optional) ", type=["jpg", "jpeg", "png"], key="inpainting_uploader")
             
+            st.divider()
             num_outputs = st.slider(
                 "Number of images to output", value=1, min_value=1, max_value=4)
             width = st.number_input("Width of output image", value=1024)
@@ -51,11 +54,11 @@ def configure_sidebar() -> None:
             submitted = st.form_submit_button(
                 "Submit", type="primary", use_container_width=True)
 
-        return option_gen, submitted, width, height, num_outputs, prompt, negative_prompt
+        return option_gen, submitted, width, height, num_outputs, prompt, negative_prompt, imgae_controlnet, image_inpainting
 
 
 def main_page(option_gen: str, submitted: bool, width: int, height: int, num_outputs: int,
-              prompt: str, negative_prompt: str) -> None:
+              prompt: str, negative_prompt: str, imgae_controlnet, image_inpainting) -> None:
     """Main page layout and logic for generating images.
 
     Args:
@@ -69,7 +72,7 @@ def main_page(option_gen: str, submitted: bool, width: int, height: int, num_out
     if submitted:
         #load 2 model types
         if option_gen == "Interior":
-            # pipe, trigger_words = load_model_base()
+            pipe, trigger_words = load_model_base()
             print("oke")
         else:
             # pipe, trigger_words = load_controlnet_model()
@@ -78,30 +81,28 @@ def main_page(option_gen: str, submitted: bool, width: int, height: int, num_out
         with st.status('👩🏾‍🍳 Whipping up your words into art...', expanded=True) as status:
             st.write("⚙️ Model initiated")
             st.write("🙆‍♀️ Stand up and strecth in the meantime")
-            try:
-                
+            try: 
                 # Only call the API if the "Submit" button was pressed
-                # if submitted:
-                #     # Calling the replicate API to get the image
-                #     with generated_images_placeholder.container():
-                #         all_images = []  # List to store all generated images
-                #         output = gen_interior_base(pipe, prompt, trigger_words, negative_prompt, num_images=num_outputs, height=height, width=width)
-                #         if output:
-                #             st.toast(
-                #                 'Your image has been generated!', icon='😍')
-                #             # Save generated image to session state
-                #             st.session_state.generated_image = output
+                if submitted:
+                    # Calling the replicate API to get the image
+                    with generated_images_placeholder.container():
+                        all_images = []  # List to store all generated images
+                        output = gen_interior_base(pipe, prompt, trigger_words, negative_prompt, num_images=num_outputs, height=height, width=width)
+                        if output:
+                            st.toast(
+                                'Your image has been generated!', icon='😍')
+                            # Save generated image to session state
+                            st.session_state.generated_image = output
 
-                #             # Displaying the image
-                #             for image in st.session_state.generated_image:
-                #                 with st.container():
-                #                     st.image(image, caption="Generated Image 🎈",
-                #                              use_column_width=True)
-                #                     # Add image to the list
-                #                     all_images.append(image)
-                #         # Save all generated images to session state
-                #         st.session_state.all_images = all_images
-                pass
+                            # Displaying the image
+                            for image in st.session_state.generated_image:
+                                with st.container():
+                                    st.image(image, caption="Generated Image 🎈",
+                                             use_column_width=True)
+                                    # Add image to the list
+                                    all_images.append(image)
+                        # Save all generated images to session state
+                        st.session_state.all_images = all_images
             except Exception as e:
                 print(e)
                 st.error(f'Encountered an error: {e}', icon="🚨")
@@ -139,8 +140,8 @@ def main():
     It retrieves the user inputs from the sidebar, and passes them to the main page function.
     The main page function then generates images based on these inputs.
     """
-    option_gen, submitted, width, height, num_outputs, prompt, negative_prompt = configure_sidebar()
-    main_page(option_gen, submitted, width, height, num_outputs, prompt, negative_prompt)
+    option_gen, submitted, width, height, num_outputs, prompt, negative_prompt, imgae_controlnet, image_inpainting = configure_sidebar()
+    main_page(option_gen, submitted, width, height, num_outputs, prompt, negative_prompt, imgae_controlnet, image_inpainting)
 
 
 if __name__ == "__main__":
