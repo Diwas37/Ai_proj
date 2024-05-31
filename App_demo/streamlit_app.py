@@ -1,12 +1,13 @@
 import streamlit as st
-import requests
-import zipfile
-import io
 from utils import icon
 from streamlit_image_select import image_select
 
+import sys
+sys.path.append('..')
+from base_gen import load_model_base, gen_interior_base
+
 # UI configurations
-st.set_page_config(page_title="Replicate Image Generator",
+st.set_page_config(page_title="Interor and Architect Generator",
                    page_icon=":bridge_at_night:",
                    layout="wide")
 icon.show_icon(":foggy:")
@@ -27,7 +28,11 @@ def configure_sidebar() -> None:
     """
     with st.sidebar:
         with st.form("my_form"):
+            option_gen = st.radio("Select an option", ("Interior", "Architect"))
+            st.session_state.option_gen = option_gen
+
             st.info("**Start here ↓**", icon="👋🏾")
+            
             prompt = st.text_area(
                 ":orange[**Enter prompt: Typing your prompt✍🏾**]",
                 value="An astronaut riding a rainbow unicorn, cinematic, dramatic",
@@ -46,10 +51,10 @@ def configure_sidebar() -> None:
             submitted = st.form_submit_button(
                 "Submit", type="primary", use_container_width=True)
 
-        return submitted, width, height, num_outputs, prompt, negative_prompt
+        return option_gen, submitted, width, height, num_outputs, prompt, negative_prompt
 
 
-def main_page(submitted: bool, width: int, height: int, num_outputs: int,
+def main_page(option_gen: str, submitted: bool, width: int, height: int, num_outputs: int,
               prompt: str, negative_prompt: str) -> None:
     """Main page layout and logic for generating images.
 
@@ -62,38 +67,45 @@ def main_page(submitted: bool, width: int, height: int, num_outputs: int,
         negative_prompt (str): Text prompt for elements to avoid in the image.
     """
     if submitted:
+        #load 2 model types
+        if option_gen == "Interior":
+            # pipe, trigger_words = load_model_base()
+            print("oke")
+        else:
+            # pipe, trigger_words = load_controlnet_model()
+            print("okewww")
+            
         with st.status('👩🏾‍🍳 Whipping up your words into art...', expanded=True) as status:
             st.write("⚙️ Model initiated")
             st.write("🙆‍♀️ Stand up and strecth in the meantime")
             try:
+                
                 # Only call the API if the "Submit" button was pressed
-                if submitted:
-                    # Calling the replicate API to get the image
-                    with generated_images_placeholder.container():
-                        all_images = []  # List to store all generated images
-                        output = 
-                        if output:
-                            st.toast(
-                                'Your image has been generated!', icon='😍')
-                            # Save generated image to session state
-                            st.session_state.generated_image = output
+                # if submitted:
+                #     # Calling the replicate API to get the image
+                #     with generated_images_placeholder.container():
+                #         all_images = []  # List to store all generated images
+                #         output = gen_interior_base(pipe, prompt, trigger_words, negative_prompt, num_images=num_outputs, height=height, width=width)
+                #         if output:
+                #             st.toast(
+                #                 'Your image has been generated!', icon='😍')
+                #             # Save generated image to session state
+                #             st.session_state.generated_image = output
 
-                            # Displaying the image
-                            for image in st.session_state.generated_image:
-                                with st.container():
-                                    st.image(image, caption="Generated Image 🎈",
-                                             use_column_width=True)
-                                    # Add image to the list
-                                    all_images.append(image)
-
-                                    response = requests.get(image)
-                        # Save all generated images to session state
-                        st.session_state.all_images = all_images
-
+                #             # Displaying the image
+                #             for image in st.session_state.generated_image:
+                #                 with st.container():
+                #                     st.image(image, caption="Generated Image 🎈",
+                #                              use_column_width=True)
+                #                     # Add image to the list
+                #                     all_images.append(image)
+                #         # Save all generated images to session state
+                #         st.session_state.all_images = all_images
+                pass
             except Exception as e:
                 print(e)
                 st.error(f'Encountered an error: {e}', icon="🚨")
-        pass
+        
     # If not submitted, chill here 🍹
     else:
         pass
@@ -117,7 +129,7 @@ def main_page(submitted: bool, width: int, height: int, num_outputs: int,
                       ],
             use_container_width=True
         )
-
+    pass
 
 def main():
     """
@@ -127,8 +139,8 @@ def main():
     It retrieves the user inputs from the sidebar, and passes them to the main page function.
     The main page function then generates images based on these inputs.
     """
-    submitted, width, height, num_outputs, prompt, negative_prompt = configure_sidebar()
-    main_page(submitted, width, height, num_outputs, prompt, negative_prompt)
+    option_gen, submitted, width, height, num_outputs, prompt, negative_prompt = configure_sidebar()
+    main_page(option_gen, submitted, width, height, num_outputs, prompt, negative_prompt)
 
 
 if __name__ == "__main__":

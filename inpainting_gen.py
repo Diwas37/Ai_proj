@@ -1,5 +1,5 @@
 from diffusers import StableDiffusionControlNetInpaintPipeline, ControlNetModel, StableDiffusionPipeline
-from utils import create_scheduler
+from utils_func import create_scheduler
 from PIL import Image
 from diffusers.utils import load_image
 import numpy as np

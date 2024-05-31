@@ -1,6 +1,6 @@
 from diffusers import StableDiffusionPipeline, DPMSolverMultistepScheduler
 import torch
-from utils import create_scheduler
+from utils_func import create_scheduler
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 

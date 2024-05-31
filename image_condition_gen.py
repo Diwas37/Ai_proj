@@ -1,6 +1,6 @@
 from diffusers import StableDiffusionControlNetPipeline, ControlNetModel, DPMSolverMultistepScheduler
 import torch
-from utils import create_scheduler
+from utils_func import create_scheduler
 import cv2
 from PIL import Image
 import numpy as np
