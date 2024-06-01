@@ -3,6 +3,7 @@ from PIL import Image
 from utils import icon
 from streamlit_image_select import image_select
 from streamlit_drawable_canvas import st_canvas
+import random
 
 import sys
 sys.path.append('..')
@@ -60,18 +61,18 @@ def main():
 
     #load 2 model types
     if option_gen == "Interior":
-        model_path = "runwayml/stable-diffusion-v1-5"
+        model_path = "../checkpoints/Interior.pt"
     else:
         model_path = "runwayml/stable-diffusion-v1-5"
     
-    pipe = load_model_base(model_path)
-    pipe_controlnet= load_controlnet_model(model_path)
-    pipe_inpainting = load_model_inpaint(model_path)
-    
+    #take image control
     if option_function == "ControlNet":
         st.write("ControlNet")
         pipe = load_controlnet_model(model_path)
         image_controlnet = st.file_uploader("Upload image", type=["jpg", "jpeg", "png"])
+        if image_controlnet is not None:
+            image_controlnet = Image.open(image_controlnet)
+            # image_controlnet.save("controlnet.jpg")
         
     elif option_function == "Inpainting":
         st.write("Inpainting")
@@ -80,7 +81,6 @@ def main():
         print(image_inpainting)
         
         if image_inpainting is not None:
-            print("zzzzzzz")
             image_inpainting = Image.open(image_inpainting)
             h, w = image_inpainting.size
             
@@ -112,10 +112,12 @@ def main():
                 mask = mask[:, :, -1] > 0
                 if mask.sum() > 0:
                     mask = Image.fromarray(mask)
-                # mask.save("mask.jpg")   
+                    
+                      
     else:
         pipe = load_model_base(model_path)
     
+    # Form for user input
     with st.sidebar:
         with st.form("generation-form"):
             prompt = st.text_area(
@@ -143,17 +145,13 @@ def main():
             st.write("🙆‍♀️ Stand up and strecth in the meantime")
             
         try: 
-            #temperal term
-            image_controlnet = None
-            image_inpainting = None
-            
-            # Only call the API if the "Submit" button was pressed
             if submitted:
                 # Calling the replicate API to get the image
                 with generated_images_placeholder.container():
                     all_images = []  # List to store all generated images
                     prompt = translate_to_eng(prompt)
                     negative_prompt = translate_to_eng(negative_prompt)
+                    seed = random.randint(0, 100000)
                     
                     if option_function == "Generate":
                         output = gen_base(pipe, 
@@ -161,16 +159,25 @@ def main():
                                         trigger_words="", 
                                         neg=negative_prompt, 
                                         num_images=num_outputs, 
-                                        height=height, width=width)
+                                        height=height, width=width,
+                                        seed = seed)
                     elif option_function == "ControlNet":
                         output = gen_controlnet(pipe, 
                                             prompt, trigger_words="", 
                                             neg=negative_prompt, 
                                             num_images=num_outputs, 
                                             height=height, width=width, 
-                                            image=image_controlnet)
+                                            image=image_controlnet,
+                                            seed = seed)
                     else: 
-                        pass
+                        output = inpaint_gen(pipe,
+                                            image_inpainting,
+                                            mask,
+                                            prompt,
+                                            neg=negative_prompt, 
+                                            num_images=num_outputs, 
+                                            height=height, width=width,
+                                            seed = seed)
                     
                     if output:
                         st.toast(
