@@ -16,10 +16,13 @@ def create_scheduler():
 def translate_to_eng(prompt):
     model_name = "VietAI/envit5-translation"
     tokenizer = AutoTokenizer.from_pretrained(model_name)  
-    model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
-    inputs = [
-    "vi:" + prompt 
-        ]
-    
+    model = AutoModelForSeq2SeqLM.from_pretrained(model_name).to('cuda')
+    inputs = ["vi:" + prompt]
     outputs = model.generate(tokenizer(inputs, return_tensors="pt", padding=True).input_ids.to('cuda'), max_length=512)
-    return tokenizer.batch_decode(outputs, skip_special_tokens=True)
+    tran =  tokenizer.batch_decode(outputs, skip_special_tokens=True)[0]
+    tran = tran.replace('en: ', '')
+    return tran
+
+if __name__ == "__main__":
+    prompt = "Hãy tạo một bức tranh với chất lượng cao, ánh sáng tốt, sang trọng"
+    print(translate_to_eng(prompt))
