@@ -43,7 +43,8 @@ def load_model_inpaint(sd_pipeline: StableDiffusionPipeline):
 def inpaint_gen(pipe, 
                 init_image, 
                 image_mask, 
-                prompt, 
+                prompt,
+                neg="", 
                 seed=43, 
                 num_images=1, 
                 num_infer_steps=20, 
@@ -55,6 +56,7 @@ def inpaint_gen(pipe,
     generator = torch.Generator(device="cuda").manual_seed(seed)
     images = pipe(
         prompt=prompt,
+        negative_prompt=neg,
         num_images_per_prompt=num_images,
         num_inference_steps=num_infer_steps,
         guidance_scale=7,
