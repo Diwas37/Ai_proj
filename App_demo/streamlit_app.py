@@ -12,6 +12,9 @@ from inpainting_gen import load_model_inpaint, inpaint_gen
 from utils_func import translate_to_eng
 
 
+#pipeline
+pipe = None
+
 # UI configurations
 st.set_page_config(page_title="Interor and Architect Generator",
                    page_icon=":bridge_at_night:",
@@ -24,89 +27,6 @@ st.markdown("# :rainbow[Interior and Architerct Generation]")
 generated_images_placeholder = st.empty()
 gallery_placeholder = st.empty()
 
-
-def main_page(option_gen: str, option_function: str, submitted: bool, width: int, height: int, num_outputs: int,
-              prompt: str, negative_prompt: str) -> None:
-    """Main page layout and logic for generating images.
-
-    Args:
-        submitted (bool): Flag indicating whether the form has been submitted.
-        width (int): Width of the output image.
-        height (int): Height of the output image.
-        num_outputs (int): Number of images to output.
-        prompt (str): Text prompt for the image generation.
-        negative_prompt (str): Text prompt for elements to avoid in the image.
-    """
-    
-    model_path = "runwayml/stable-diffusion-v1-5"
-    if submitted:
-        #temporal
-        pipe = load_model_base(model_path)
-        pipe_controlnet= load_controlnet_model(model_path)
-        pipe_inpainting = load_model_inpaint(model_path)
-        #temp
-        
-        with st.status('👩🏾‍🍳 Whipping up your words into art...', expanded=True) as status:
-            st.write("⚙️ Model initiated")
-            st.write("🙆‍♀️ Stand up and strecth in the meantime")
-            try: 
-                #temperal term
-                image_controlnet = None
-                image_inpainting = None
-                
-                # Only call the API if the "Submit" button was pressed
-                if submitted:
-                    # Calling the replicate API to get the image
-                    with generated_images_placeholder.container():
-                        all_images = []  # List to store all generated images
-                        prompt = translate_to_eng(prompt)
-                        negative_prompt = translate_to_eng(negative_prompt)
-                        
-                        #generate image
-                        if image_controlnet is None and image_inpainting is None:
-                            output = gen_base(pipe, 
-                                            prompt, 
-                                            trigger_words="", 
-                                            neg=negative_prompt, 
-                                            num_images=num_outputs, 
-                                            eight=height, width=width)
-                        elif image_inpainting is None:
-                            output = gen_controlnet(pipe_controlnet, 
-                                                    prompt, trigger_words="", 
-                                                    neg=negative_prompt, 
-                                                    num_images=num_outputs, 
-                                                    height=height, width=width, 
-                                                    image=image_controlnet)
-                        else:
-                            output = inpaint_gen(pipe_inpainting, 
-                                                 image_controlnet, 
-                                                 image_inpainting, 
-                                                 prompt, negative_prompt, 
-                                                 num_images=num_outputs, 
-                                                 height=height, width=width)
-                        
-                        if output:
-                            st.toast(
-                                'Your image has been generated!', icon='😍')
-                            # Save generated image to session state
-                            st.session_state.generated_image = output
-
-                            # Displaying the image
-                            for image in st.session_state.generated_image:
-                                with st.container():
-                                    st.image(image, caption="Generated Image 🎈",
-                                             use_column_width=True)
-                                    # Add image to the list
-                                    all_images.append(image)
-                        # Save all generated images to session state
-                        st.session_state.all_images = all_images
-            except Exception as e:
-                print(e)
-                st.error(f'Encountered an error: {e}', icon="🚨")
-        
-    # If not submitted, chill here 🍹
-    else:
-        pass
 
     # Gallery display for inspo
     # with gallery_placeholder.container():
@@ -144,18 +64,19 @@ def main():
     else:
         model_path = "runwayml/stable-diffusion-v1-5"
     
-    # pipe = load_model_base(model_path)
-    # pipe_controlnet= load_controlnet_model(model_path)
-    # pipe_inpainting = load_model_inpaint(model_path)
+    pipe = load_model_base(model_path)
+    pipe_controlnet= load_controlnet_model(model_path)
+    pipe_inpainting = load_model_inpaint(model_path)
     
     if option_function == "ControlNet":
         st.write("ControlNet")
+        pipe = load_controlnet_model(model_path)
         image_controlnet = st.file_uploader("Upload image", type=["jpg", "jpeg", "png"])
         
     elif option_function == "Inpainting":
         st.write("Inpainting")
+        pipe = load_model_inpaint(model_path)
         image_inpainting = st.file_uploader("Upload image", type=["jpg", "jpeg", "png"])
-        print("aaaa")
         print(image_inpainting)
         
         if image_inpainting is not None:
@@ -193,31 +114,84 @@ def main():
                     mask = Image.fromarray(mask)
                 # mask.save("mask.jpg")   
     else:
-        pass
+        pipe = load_model_base(model_path)
     
     with st.sidebar:
         with st.form("generation-form"):
             prompt = st.text_area(
                 ":orange[**Enter prompt: ✍🏾**]",
-                value="An astronaut riding a rainbow unicorn, cinematic, dramatic",
-                height=100)
+                value="1 cô gái",
+                height=150)
             negative_prompt = st.text_area(":orange[**Negative prompt 🙅🏽‍♂️**]",
-                                            value="the absolute worst quality, distorted features",
+                                            value="",
                                             help="This is a negative prompt, basically type what you don't want to see in the generated image",
                                             height=100)
             
             st.divider()
             num_outputs = st.slider(
                 "Number of images to output", value=1, min_value=1, max_value=4)
-            width = st.number_input("Width of output image", value=1024)
-            height = st.number_input("Height of output image", value=1024)
+            width = st.number_input("Width of output image", value=512)
+            height = st.number_input("Height of output image", value=512)
 
             # The Big Red "Submit" Button!
             submitted = st.form_submit_button(
                 "Submit", type="primary", use_container_width=True)
     
-    main_page(option_gen, option_function, submitted, width, height, num_outputs, prompt, negative_prompt)
+    if submitted:
+        with st.status('👩🏾‍🍳 Whipping up your words into art...', expanded=True) as status:
+            st.write("⚙️ Model initiated")
+            st.write("🙆‍♀️ Stand up and strecth in the meantime")
+            
+        try: 
+            #temperal term
+            image_controlnet = None
+            image_inpainting = None
+            
+            # Only call the API if the "Submit" button was pressed
+            if submitted:
+                # Calling the replicate API to get the image
+                with generated_images_placeholder.container():
+                    all_images = []  # List to store all generated images
+                    prompt = translate_to_eng(prompt)
+                    negative_prompt = translate_to_eng(negative_prompt)
+                    
+                    if option_function == "Generate":
+                        output = gen_base(pipe, 
+                                        prompt, 
+                                        trigger_words="", 
+                                        neg=negative_prompt, 
+                                        num_images=num_outputs, 
+                                        height=height, width=width)
+                    elif option_function == "ControlNet":
+                        output = gen_controlnet(pipe, 
+                                            prompt, trigger_words="", 
+                                            neg=negative_prompt, 
+                                            num_images=num_outputs, 
+                                            height=height, width=width, 
+                                            image=image_controlnet)
+                    else: 
+                        pass
+                    
+                    if output:
+                        st.toast(
+                            'Your image has been generated!', icon='😍')
+                        # Save generated image to session state
+                        st.session_state.generated_image = output
 
+                        # Displaying the image
+                        for image in st.session_state.generated_image:
+                            with st.container():
+                                st.image(image, caption="Generated Image 🎈",
+                                            use_column_width=True)
+                                # Add image to the list
+                                all_images.append(image)
+                    # Save all generated images to session state
+                    st.session_state.all_images = all_images
+        
+        except Exception as e:
+            print(e)
+            st.error(f'Encountered an error: {e}', icon="🚨")
+    
 
 if __name__ == "__main__":
     main()
