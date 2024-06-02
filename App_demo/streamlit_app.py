@@ -4,6 +4,7 @@ from utils import icon
 from streamlit_image_select import image_select
 from streamlit_drawable_canvas import st_canvas
 import random
+import numpy as np
 
 import sys
 sys.path.append('..')
@@ -63,7 +64,7 @@ def main():
     if option_gen == "Interior":
         model_path = "../checkpoints/Interior.pt"
     else:
-        model_path = "runwayml/stable-diffusion-v1-5"
+        model_path = "../checkpoints/Exterior.safetensors"
     
     #take image control
     if option_function == "ControlNet":
@@ -72,6 +73,8 @@ def main():
         image_controlnet = st.file_uploader("Upload image", type=["jpg", "jpeg", "png"])
         if image_controlnet is not None:
             image_controlnet = Image.open(image_controlnet)
+            h, w = image_controlnet.size
+            st.image(image_controlnet, caption='Uploaded Image', use_column_width=0.8)
             # image_controlnet.save("controlnet.jpg")
         
     elif option_function == "Inpainting":
@@ -86,7 +89,7 @@ def main():
             
             fill_color = "rgba(255, 255, 255, 0.0)"
             stroke_width = st.number_input("Brush Size",
-                                        value=64,
+                                        value=50,
                                         min_value=1,
                                         max_value=100)
             stroke_color = "rgba(255, 255, 255, 1.0)"
@@ -107,11 +110,13 @@ def main():
                 drawing_mode=drawing_mode,
                 key="canvas",
             )
-            if canvas_result:
+            if canvas_result.image_data is not None:
                 mask = canvas_result.image_data
                 mask = mask[:, :, -1] > 0
                 if mask.sum() > 0:
-                    mask = Image.fromarray(mask)
+                    mask = mask.astype(bool)
+                    mask = Image.fromarray(mask.astype('uint8') * 255).convert('L')
+                    mask.save("j.jpg")
                     
                       
     else:
@@ -144,60 +149,65 @@ def main():
             st.write("⚙️ Model initiated")
             st.write("🙆‍♀️ Stand up and strecth in the meantime")
             
-        try: 
-            if submitted:
-                # Calling the replicate API to get the image
-                with generated_images_placeholder.container():
-                    all_images = []  # List to store all generated images
-                    prompt = translate_to_eng(prompt)
-                    negative_prompt = translate_to_eng(negative_prompt)
-                    seed = random.randint(0, 100000)
+        # try: 
+        if submitted:
+            # Calling the replicate API to get the image
+            with generated_images_placeholder.container():
+                all_images = []  # List to store all generated images
+                prompt = translate_to_eng(prompt)
+                negative_prompt = translate_to_eng(negative_prompt)
+                seed = random.randint(0, 100000)
+                
+                if option_function == "Generate":
+                    output = gen_base(pipe, 
+                                    prompt, 
+                                    trigger_words="", 
+                                    neg=negative_prompt, 
+                                    num_images=num_outputs, 
+                                    height=height, width=width,
+                                    seed = seed)
+                elif option_function == "ControlNet":
+                    output = gen_controlnet(pipe, 
+                                        prompt, trigger_words="", 
+                                        neg=negative_prompt, 
+                                        num_images=num_outputs, 
+                                        height=height, width=width, 
+                                        image=image_controlnet,
+                                        seed = seed)
+                else: 
+                    image_inpainting = Image.fromarray(np.array(image_inpainting))
+                    mask = mask.convert("RGB")
                     
-                    if option_function == "Generate":
-                        output = gen_base(pipe, 
-                                        prompt, 
-                                        trigger_words="", 
+                    output = inpaint_gen(pipe,
+                                        image_inpainting,
+                                        mask,
+                                        prompt,
                                         neg=negative_prompt, 
                                         num_images=num_outputs, 
                                         height=height, width=width,
                                         seed = seed)
-                    elif option_function == "ControlNet":
-                        output = gen_controlnet(pipe, 
-                                            prompt, trigger_words="", 
-                                            neg=negative_prompt, 
-                                            num_images=num_outputs, 
-                                            height=height, width=width, 
-                                            image=image_controlnet,
-                                            seed = seed)
-                    else: 
-                        output = inpaint_gen(pipe,
-                                            image_inpainting,
-                                            mask,
-                                            prompt,
-                                            neg=negative_prompt, 
-                                            num_images=num_outputs, 
-                                            height=height, width=width,
-                                            seed = seed)
-                    
-                    if output:
-                        st.toast(
-                            'Your image has been generated!', icon='😍')
-                        # Save generated image to session state
-                        st.session_state.generated_image = output
+                
+                if output:
+                    st.toast('Your image has been generated!', icon='😍')
+                    # Save generated image to session state
+                    st.session_state.generated_image = output
 
-                        # Displaying the image
-                        for image in st.session_state.generated_image:
-                            with st.container():
-                                st.image(image, caption="Generated Image 🎈",
-                                            use_column_width=True)
-                                # Add image to the list
-                                all_images.append(image)
+                    # Displaying the image
+                    for image in st.session_state.generated_image:
+                        with st.container():
+                            # Display image with specified width to make it appear smaller
+                            st.image(image, caption="Generated Image 🎈", use_column_width=0.8)  # Set width as desired
+
+                            # Add image to the list
+                            all_images.append(image)
+
                     # Save all generated images to session state
                     st.session_state.all_images = all_images
+
         
-        except Exception as e:
-            print(e)
-            st.error(f'Encountered an error: {e}', icon="🚨")
+        # except Exception as e:
+        #     print(e)
+        #     st.error(f'Encountered an error: {e}', icon="🚨")
     
 
 if __name__ == "__main__":
