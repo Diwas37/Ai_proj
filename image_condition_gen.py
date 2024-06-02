@@ -10,7 +10,7 @@ def load_controlnet_model(model_path: str):
         "lllyasviel/sd-controlnet-canny", torch_dtype=torch.float16
     )
     
-    pipe_controlnet = StableDiffusionControlNetPipeline.from_pretrained(
+    pipe_controlnet = StableDiffusionControlNetPipeline.from_single_file(
         model_path,
         controlnet=controlnet, 
         safety_checker=None,
@@ -37,12 +37,14 @@ def gen_controlnet(pipe_controlnet,
                             trigger_words="",
                             neg="",
                             seed=42,
-                            num_inference_steps=35,
+                            num_inference_steps=45,
                             height=512, 
                             width=512,
                             num_images=1,
                             image=None):
     prompt = prompt + " high quality, lightning, luxury" + trigger_words
+    neg = neg + " soft line,curved line,sketch,ugly,logo,pixelated,lowres,text,word,cropped,low quality,normal quality,username,watermark,signature,blurry,soft"
+    
     scheduler = create_scheduler()
     image_control = preprocessor_image(image)
     # image_control.save("control.jpg")
@@ -64,10 +66,10 @@ def gen_controlnet(pipe_controlnet,
 
 
 if __name__ == "__main__":
-    pipe_controlnet = load_controlnet_model("runwayml/stable-diffusion-v1-5",)
-    prompt = "a living room with a red wardrobe, 2 beautiful small trees, red table and 2 sofa, no lighting from windows"
+    pipe_controlnet = load_controlnet_model("checkpoints/Interior.pt",)
+    prompt = "a living room with a TV, wooden floor, a sofa, a nice glass table and a flower in the table"
     negative_prompt = "(multiple outlets:1.9),carpets,(multiple tv screens:1.9),2 tables,lamps,lightbuble,(plants:1.6)bad-hands-5, ng_deepnegative_v1_75t, EasyNegative, bad_prompt_version2, bad-artist-anime, bad-artist, bad-image-v2-39000, verybadimagenegative_v1.3, text, close up, cropped, out of frame, worst quality, low quality, jpeg artifacts, ugly, duplicate, morbid, mutilated, extra fingers, mutated hands, poorly drawn hands, poorly drawn face, mutation, deformed, blurry, dehydrated, bad anatomy, bad proportions, extra limbs, cloned face, disfigured, gross proportions, malformed limbs, missing arms, missing legs, extra arms, extra legs, fused fingers, too many fingers, long neck"
-    image = Image.open("/home/ubuntu/code/trgtuan/Interior-stable-difusion/interior.jpg")
+    image = Image.open("/home/ubuntu/old_code/trgtuan/Interior-stable-difusion/interior.jpg")
     images = gen_controlnet(pipe_controlnet, prompt, trigger_words="", neg=negative_prompt, num_images=1, image=image)
     image = images[0]
     image.save("interior_control.jpg")

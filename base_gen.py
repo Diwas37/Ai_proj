@@ -5,7 +5,7 @@ from utils_func import create_scheduler
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 def load_model_base(model_path: str):
-    pipe = StableDiffusionPipeline.from_pretrained(model_path, use_safetensors = True).to(device)
+    pipe = StableDiffusionPipeline.from_single_file(model_path).to(device)
 
     # pipe.load_lora_weights("TrgTuan10/Interior", weight_name="xsarchitectural-7.safetensors", adapter_name="architecture")
     # trigger_words = " ,VERRIERES, DAYLIGHTINDIRECT, LIGHTINGAD, MAGAZINE8K, CINEMATIC LIGHTING, EPIC COMPOSITION"
@@ -18,11 +18,12 @@ def gen_base(pipe,
                  neg="", 
                  seed=42, 
                  num_images=1, 
-                 num_infer_steps=35, 
-                 height=512, 
-                 width=512):
+                 num_infer_steps=45, 
+                 height=768, 
+                 width=1024):
     
     prompt = prompt + " high quality, lightning, luxury" + trigger_words
+    neg = neg + " soft line,curved line,sketch,ugly,logo,pixelated,lowres,text,word,cropped,low quality,normal quality,username,watermark,signature,blurry,soft"
     
     scheduler = create_scheduler()
     
@@ -42,9 +43,9 @@ def gen_base(pipe,
     return images.images
 
 if __name__ == "__main__":
-    pipe = load_model_base("runwayml/stable-diffusion-v1-5",)
-    prompts = "a living room with a glass wardrobe, 2 beautiful small trees, wooden table and 2 sofa, lighting from windows"
-    negative_prompt = "(multiple outlets:1.9),carpets,(multiple tv screens:1.9),2 tables,lamps,lightbuble,(plants:1.6)bad-hands-5, ng_deepnegative_v1_75t, EasyNegative, bad_prompt_version2, bad-artist-anime, bad-artist, bad-image-v2-39000, verybadimagenegative_v1.3, text, close up, cropped, out of frame, worst quality, low quality, jpeg artifacts, ugly, duplicate, morbid, mutilated, extra fingers, mutated hands, poorly drawn hands, poorly drawn face, mutation, deformed, blurry, dehydrated, bad anatomy, bad proportions, extra limbs, cloned face, disfigured, gross proportions, malformed limbs, missing arms, missing legs, extra arms, extra legs, fused fingers, too many fingers, long neck"
+    pipe = load_model_base("checkpoints/Interior.pt")
+    prompts = "a living room with a TV, wooden floor, a sofa, a nice glass table and a flower in the table"
+    negative_prompt = ""
     images = gen_base(pipe, prompts, neg=negative_prompt, trigger_words="", num_images=1)
     image = images[0]
     image.save("interior.jpg")
