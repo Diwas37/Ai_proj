@@ -24,5 +24,5 @@ def translate_to_eng(prompt):
     return tran
 
 if __name__ == "__main__":
-    prompt = "Hãy tạo một bức tranh với chất lượng cao, ánh sáng tốt, sang trọng"
+    prompt = "a living room with a TV, wooden floor, a sofa, a nice glass table and a flower in the table"
     print(translate_to_eng(prompt))
