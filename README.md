@@ -12,6 +12,7 @@ pip install -r requirements.txt
 
 ## Download checkpoint
 ```
+mkdir checkpoints
 cd checkpoints
 wget https://civitai.com/api/download/models/50722 -O Interior.pt
 wget https://civitai.com/api/download/models/123908 -O Exterior.safetensor
