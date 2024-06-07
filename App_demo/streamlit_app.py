@@ -133,8 +133,8 @@ def main():
             # Calling the replicate API to get the image
             with generated_images_placeholder.container():
                 all_images = []  # List to store all generated images
-                prompt = translate_to_eng(prompt)
-                negative_prompt = translate_to_eng(negative_prompt)
+                # prompt = translate_to_eng(prompt)
+                # negative_prompt = translate_to_eng(negative_prompt)
                 seed = random.randint(0, 100000)
                 
                 if option_function == "Generate":
