@@ -29,12 +29,8 @@ st.markdown("# :rainbow[Interior and Architerct Generation]")
 generated_images_placeholder = st.empty()
 gallery_placeholder = st.empty()
 
-pipe_base_interior = load_model_base("../checkpoints/Interior.pt")
-pipe_base_exterior = load_model_base("../checkpoints/Exterior.safetensors")
-pipe_controlnet_interior = load_controlnet_model("../checkpoints/Interior.pt")
-pipe_controlnet_exterior = load_controlnet_model("../checkpoints/Exterior.safetensors")
-pipe_inpaint_interior = load_model_inpaint("../checkpoints/Interior.pt")
-pipe_inpaint_exterior = load_model_inpaint("../checkpoints/Exterior.safetensors")
+
+
 
 def main():
     
@@ -46,9 +42,15 @@ def main():
     option_function = st.sidebar.selectbox(
         "Choose a function", ["Generate", "ControlNet", "Inpainting"], index=0)
 
+    #load 2 model types
+    if option_gen == "Interior":
+        model_path = "../checkpoints/Interior.pt"
+    else:
+        model_path = "../checkpoints/Exterior.safetensors"
     
     #take image control
     if option_function == "ControlNet":
+        pipe = load_controlnet_model(model_path)
         image_controlnet = st.file_uploader("Upload image", type=["jpg", "jpeg", "png"])
         if image_controlnet is not None:
             image_controlnet = Image.open(image_controlnet)
@@ -57,6 +59,7 @@ def main():
             # image_controlnet.save("controlnet.jpg")
         
     elif option_function == "Inpainting":
+        pipe = load_model_inpaint(model_path)
         image_inpainting = st.file_uploader("Upload image", type=["jpg", "jpeg", "png"])
         # print(image_inpainting)
         
@@ -94,6 +97,10 @@ def main():
                     mask = mask.astype(bool)
                     mask = Image.fromarray(mask.astype('uint8') * 255).convert('L')
                     mask.save("j.jpg")
+                    
+                      
+    else:
+        pipe = load_model_base(model_path)
     
     # Form for user input
     with st.sidebar:
@@ -127,67 +134,38 @@ def main():
             # Calling the replicate API to get the image
             with generated_images_placeholder.container():
                 all_images = []  # List to store all generated images
-                # prompt = translate_to_eng(prompt)
-                # negative_prompt = translate_to_eng(negative_prompt)
+                prompt = translate_to_eng(prompt)
+                negative_prompt = translate_to_eng(negative_prompt)
                 seed = random.randint(0, 100000)
-                if option_gen == "Interior":
-                    if option_function == "Generate":
-                        output = gen_base(pipe_base_interior, 
-                                        prompt, 
-                                        trigger_words="", 
+                
+                if option_function == "Generate":
+                    output = gen_base(pipe, 
+                                    prompt, 
+                                    trigger_words="", 
+                                    neg=negative_prompt, 
+                                    num_images=num_outputs, 
+                                    height=height, width=width,
+                                    seed = seed)
+                elif option_function == "ControlNet":
+                    output = gen_controlnet(pipe, 
+                                        prompt, trigger_words="", 
+                                        neg=negative_prompt, 
+                                        num_images=num_outputs, 
+                                        height=height, width=width, 
+                                        image=image_controlnet,
+                                        seed = seed)
+                else: 
+                    image_inpainting = Image.fromarray(np.array(image_inpainting))
+                    mask = mask.convert("RGB")
+                    
+                    output = inpaint_gen(pipe,
+                                        image_inpainting,
+                                        mask,
+                                        prompt,
                                         neg=negative_prompt, 
                                         num_images=num_outputs, 
                                         height=height, width=width,
                                         seed = seed)
-                    elif option_function == "ControlNet":
-                        output = gen_controlnet(pipe_controlnet_interior, 
-                                            prompt, trigger_words="", 
-                                            neg=negative_prompt, 
-                                            num_images=num_outputs, 
-                                            height=height, width=width, 
-                                            image=image_controlnet,
-                                            seed = seed)
-                    else: 
-                        image_inpainting = Image.fromarray(np.array(image_inpainting))
-                        mask = mask.convert("RGB")
-                        
-                        output = inpaint_gen(pipe_controlnet_interior,
-                                            image_inpainting,
-                                            mask,
-                                            prompt,
-                                            neg=negative_prompt, 
-                                            num_images=num_outputs, 
-                                            height=height, width=width,
-                                            seed = seed)
-                else:
-                    if option_function == "Generate":
-                        output = gen_base(pipe_base_exterior, 
-                                        prompt, 
-                                        trigger_words="", 
-                                        neg=negative_prompt, 
-                                        num_images=num_outputs, 
-                                        height=height, width=width,
-                                        seed = seed)
-                    elif option_function == "ControlNet":
-                        output = gen_controlnet(pipe_controlnet_exterior, 
-                                            prompt, trigger_words="", 
-                                            neg=negative_prompt, 
-                                            num_images=num_outputs, 
-                                            height=height, width=width, 
-                                            image=image_controlnet,
-                                            seed = seed)
-                    else: 
-                        image_inpainting = Image.fromarray(np.array(image_inpainting))
-                        mask = mask.convert("RGB")
-                        
-                        output = inpaint_gen(pipe_inpaint_exterior,
-                                            image_inpainting,
-                                            mask,
-                                            prompt,
-                                            neg=negative_prompt, 
-                                            num_images=num_outputs, 
-                                            height=height, width=width,
-                                            seed = seed)
                 
                 if output:
                     st.toast('Your image has been generated!', icon='😍')
