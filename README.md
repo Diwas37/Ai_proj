@@ -2,7 +2,6 @@
 
 ## Installation and environment setup
 ```
-git clone 
 git clone https://github.com/Trgtuan10/Interior-stable-difusion.git
 
 python3 -m venv .env
