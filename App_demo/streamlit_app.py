@@ -90,14 +90,13 @@ def main():
                 drawing_mode=drawing_mode,
                 key="canvas",
             )
-            if canvas_result.image_data is not None:
+            if canvas_result.json_data is not None:
                 mask = canvas_result.image_data
                 mask = mask[:, :, -1] > 0
                 if mask.sum() > 0:
                     mask = mask.astype(bool)
                     mask = Image.fromarray(mask.astype('uint8') * 255).convert('L')
                     mask.save("j.jpg")
-                    
                       
     else:
         pipe = load_model_base(model_path)
