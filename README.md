@@ -13,8 +13,9 @@ pip install -r requirements.txt
 ```
 mkdir checkpoints
 cd checkpoints
-wget https://civitai.com/api/download/models/50722 -O Interior.pt
+wget https://civitai.com/api/download/models/128713 -O Interior.safetensors
 wget https://civitai.com/api/download/models/123908 -O Exterior.safetensors
+wget https://civitai.com/api/download/models/195419 -O Interior_lora.safetensors
 ```
 
 ## Run app
