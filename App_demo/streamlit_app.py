@@ -44,13 +44,16 @@ def main():
 
     #load 2 model types
     if option_gen == "Interior":
-        model_path = "../checkpoints/Interior.pt"
+        model_path = "../checkpoints/Interior.safetensors"
     else:
         model_path = "../checkpoints/Exterior.safetensors"
     
     #take image control
     if option_function == "ControlNet":
         pipe = load_controlnet_model(model_path)
+        pipe.load_lora_weights("checkpoints/Interior_lora.safetensors", weight_name="Interior_lora.safetensors")
+        pipe.fuse_lora(lora_scale=0.7)
+        
         image_controlnet = st.file_uploader("Upload image", type=["jpg", "jpeg", "png"])
         if image_controlnet is not None:
             image_controlnet = Image.open(image_controlnet)
@@ -60,6 +63,9 @@ def main():
         
     elif option_function == "Inpainting":
         pipe = load_model_inpaint(model_path)
+        pipe.load_lora_weights("checkpoints/Interior_lora.safetensors", weight_name="Interior_lora.safetensors")
+        pipe.fuse_lora(lora_scale=0.7)
+        
         image_inpainting = st.file_uploader("Upload image", type=["jpg", "jpeg", "png"])
         # print(image_inpainting)
         
@@ -100,6 +106,8 @@ def main():
                       
     else:
         pipe = load_model_base(model_path)
+        pipe.load_lora_weights("checkpoints/Interior_lora.safetensors", weight_name="Interior_lora.safetensors")
+        pipe.fuse_lora(lora_scale=0.7)
     
     # Form for user input
     with st.sidebar:

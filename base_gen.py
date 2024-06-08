@@ -43,8 +43,8 @@ def gen_base(pipe,
     return images.images
 
 if __name__ == "__main__":
-    pipe = load_model_base("checkpoints/Interior.pt")
-    prompts = "a living room with a TV, wooden floor, a sofa, a nice glass table and a flower in the table"
+    pipe = load_model_base("checkpoints/Exterior.safetensors")
+    prompts = "A modern three-storey house with white-painted wooden front and main doors"
     negative_prompt = ""
     images = gen_base(pipe, prompts, neg=negative_prompt, trigger_words="", num_images=1)
     image = images[0]
