@@ -176,11 +176,10 @@ if __name__ == "__main__":
     pipe_base.load_lora_weights("../checkpoints", weight_name="Interior_lora.safetensors")
     pipe_base.fuse_lora(lora_scale=0.7)
     
-    pipe_controlnet = load_model_base("../checkpoints/Interior.safetensors")
-    # pipe_controlnet = load_controlnet_model("../checkpoints/Interior.savetensors")
-    # pipe_controlnet.load_lora_weights("../checkpoints", weight_name="Interior_lora.safetensors")
-    # pipe_controlnet.fuse_lora(lora_scale=0.7)
+    pipe_controlnet = load_controlnet_model("../checkpoints/Interior.safetensors")
+    pipe_controlnet.load_lora_weights("../checkpoints", weight_name="Interior_lora.safetensors")
+    pipe_controlnet.fuse_lora(lora_scale=0.7)
     
-    # pipe_inpaint = load_model_inpaint("../checkpoints/Interior.safetensors")
+    pipe_inpaint = load_model_inpaint("../checkpoints/Interior.safetensors")
     
     main()
