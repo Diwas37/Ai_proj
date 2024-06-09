@@ -11,7 +11,7 @@ sys.path.append('..')
 from base_gen import load_model_base, gen_base
 from image_condition_gen import load_controlnet_model, gen_controlnet
 from inpainting_gen import load_model_inpaint, inpaint_gen
-from utils_func import translate_to_eng
+
 
 
 #pipeline
@@ -172,15 +172,15 @@ def main():
     
 
 if __name__ == "__main__":
-    pipe_base = load_model_base("checkpoints/Interior.safetensors")
-    pipe_base.load_lora_weights("checkpoints", weight_name="Interior_lora.safetensors")
-    pipe.fuse_lora(lora_scale=0.7)
+    pipe_base = load_model_base("../checkpoints/Interior.safetensors")
+    pipe_base.load_lora_weights("../checkpoints", weight_name="Interior_lora.safetensors")
+    pipe_base.fuse_lora(lora_scale=0.7)
     
+    pipe_controlnet = load_model_base("../checkpoints/Interior.safetensors")
+    # pipe_controlnet = load_controlnet_model("../checkpoints/Interior.savetensors")
+    # pipe_controlnet.load_lora_weights("../checkpoints", weight_name="Interior_lora.safetensors")
+    # pipe_controlnet.fuse_lora(lora_scale=0.7)
     
-    pipe_controlnet = load_controlnet_model("checkpoints/Interior.savetensors")
-    pipe_controlnet.load_lora_weights("checkpoints", weight_name="Interior_lora.safetensors")
-    pipe.fuse_lora(lora_scale=0.7)
-    
-    pipe_inpaint = load_model_inpaint("checkpoints/Interior.safetensors")
+    # pipe_inpaint = load_model_inpaint("../checkpoints/Interior.safetensors")
     
     main()

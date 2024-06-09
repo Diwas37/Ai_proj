@@ -47,7 +47,9 @@ if __name__ == "__main__":
     pipe.load_lora_weights("checkpoints", weight_name="Interior_lora.safetensors")
     pipe.fuse_lora(lora_scale=0.7)
     
-    prompts = "A modern three-storey house with white-painted wooden front and main doors"
+    print(pipe.get_active)
+    
+    prompts = "A modern living room"
     negative_prompt = ""
     images = gen_base(pipe, prompts, neg=negative_prompt, trigger_words="", num_images=1)
     image = images[0]
