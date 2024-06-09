@@ -43,7 +43,7 @@ def gen_base(pipe,
     return images.images
 
 if __name__ == "__main__":
-    pipe = load_model_base("checkpoints/Exterior.safetensors")
+    pipe = load_model_base("checkpoints/Interior.safetensors")
     pipe.load_lora_weights("checkpoints", weight_name="Interior_lora.safetensors")
     pipe.fuse_lora(lora_scale=0.7)
     

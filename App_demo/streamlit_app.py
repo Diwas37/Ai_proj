@@ -36,24 +36,11 @@ def main():
     
     st.sidebar.info("**Start here ↓**", icon="👋🏾")
 
-    #two choosen option only
-    option_gen = st.sidebar.selectbox(
-        "Choose a model", ["Interior", "Exterior"], index=0)
     option_function = st.sidebar.selectbox(
-        "Choose a function", ["Generate", "ControlNet", "Inpainting"], index=0)
+        "Choose a function", ["Generate", "Fix Style", "Replace object"], index=0)
 
-    #load 2 model types
-    if option_gen == "Interior":
-        model_path = "../checkpoints/Interior.safetensors"
-    else:
-        model_path = "../checkpoints/Exterior.safetensors"
-    
     #take image control
-    if option_function == "ControlNet":
-        pipe = load_controlnet_model(model_path)
-        pipe.load_lora_weights("checkpoints/Interior_lora.safetensors", weight_name="Interior_lora.safetensors")
-        pipe.fuse_lora(lora_scale=0.7)
-        
+    if option_function == "Fixing Style":
         image_controlnet = st.file_uploader("Upload image", type=["jpg", "jpeg", "png"])
         if image_controlnet is not None:
             image_controlnet = Image.open(image_controlnet)
@@ -61,11 +48,7 @@ def main():
             st.image(image_controlnet, caption='Uploaded Image', use_column_width=0.8)
             # image_controlnet.save("controlnet.jpg")
         
-    elif option_function == "Inpainting":
-        pipe = load_model_inpaint(model_path)
-        pipe.load_lora_weights("checkpoints/Interior_lora.safetensors", weight_name="Interior_lora.safetensors")
-        pipe.fuse_lora(lora_scale=0.7)
-        
+    elif option_function == "Replace object":
         image_inpainting = st.file_uploader("Upload image", type=["jpg", "jpeg", "png"])
         # print(image_inpainting)
         
@@ -104,17 +87,13 @@ def main():
                     mask = Image.fromarray(mask.astype('uint8') * 255).convert('L')
                     mask.save("j.jpg")
                       
-    else:
-        pipe = load_model_base(model_path)
-        pipe.load_lora_weights("checkpoints/Interior_lora.safetensors", weight_name="Interior_lora.safetensors")
-        pipe.fuse_lora(lora_scale=0.7)
     
     # Form for user input
     with st.sidebar:
         with st.form("generation-form"):
             prompt = st.text_area(
                 ":orange[**Enter prompt: ✍🏾**]",
-                value="1 cô gái",
+                value="a modern living room with a sofa and a TV",
                 height=150)
             negative_prompt = st.text_area(":orange[**Negative prompt 🙅🏽‍♂️**]",
                                             value="",
@@ -146,15 +125,15 @@ def main():
                 seed = random.randint(0, 100000)
                 
                 if option_function == "Generate":
-                    output = gen_base(pipe, 
+                    output = gen_base(pipe_base, 
                                     prompt, 
                                     trigger_words="", 
                                     neg=negative_prompt, 
                                     num_images=num_outputs, 
                                     height=height, width=width,
                                     seed = seed)
-                elif option_function == "ControlNet":
-                    output = gen_controlnet(pipe, 
+                elif option_function == "Fix Style":
+                    output = gen_controlnet(pipe_controlnet, 
                                         prompt, trigger_words="", 
                                         neg=negative_prompt, 
                                         num_images=num_outputs, 
@@ -165,7 +144,7 @@ def main():
                     image_inpainting = Image.fromarray(np.array(image_inpainting))
                     mask = mask.convert("RGB")
                     
-                    output = inpaint_gen(pipe,
+                    output = inpaint_gen(pipe_inpaint,
                                         image_inpainting,
                                         mask,
                                         prompt,
@@ -190,12 +169,18 @@ def main():
 
                     # Save all generated images to session state
                     st.session_state.all_images = all_images
-
-        
-        # except Exception as e:
-        #     print(e)
-        #     st.error(f'Encountered an error: {e}', icon="🚨")
     
 
 if __name__ == "__main__":
+    pipe_base = load_model_base("checkpoints/Interior.safetensors")
+    pipe_base.load_lora_weights("checkpoints", weight_name="Interior_lora.safetensors")
+    pipe.fuse_lora(lora_scale=0.7)
+    
+    
+    pipe_controlnet = load_controlnet_model("checkpoints/Interior.savetensors")
+    pipe_controlnet.load_lora_weights("checkpoints", weight_name="Interior_lora.safetensors")
+    pipe.fuse_lora(lora_scale=0.7)
+    
+    pipe_inpaint = load_model_inpaint("checkpoints/Interior.safetensors")
+    
     main()

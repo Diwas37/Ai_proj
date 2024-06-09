@@ -42,8 +42,8 @@ def gen_controlnet(pipe_controlnet,
                             width=512,
                             num_images=1,
                             image=None):
-    prompt = prompt + " high quality, lightning, luxury" + trigger_words
-    neg = neg + " soft line,curved line,sketch,ugly,logo,pixelated,lowres,text,word,cropped,low quality,normal quality,username,watermark,signature,blurry,soft"
+    prompt = prompt + "photography, minimalism, cinematic, canon EOS 5d, natural sunlight, studio lights –ar 9:16 –s 140 --stylize 750" + trigger_words
+    neg = neg + " ignature, soft, blurry, drawing, sketch, poor quality, ugly, text, type, word, logo, pixelated, low resolution, saturated, high contrast, oversharpened"
     
     scheduler = create_scheduler()
     image_control = preprocessor_image(image)
