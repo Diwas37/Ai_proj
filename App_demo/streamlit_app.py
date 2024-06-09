@@ -125,7 +125,10 @@ def main():
                 seed = random.randint(0, 100000)
                 
                 if option_function == "Generate":
-                    output = gen_base(pipe_base, 
+                    pipe = load_model_base("../checkpoints/Interior.safetensors")
+                    pipe.load_lora_weights("../checkpoints", weight_name="Interior_lora.safetensors")
+                    pipe.fuse_lora(lora_scale=0.7)
+                    output = gen_base(pipe, 
                                     prompt, 
                                     trigger_words="", 
                                     neg=negative_prompt, 
@@ -133,7 +136,10 @@ def main():
                                     height=height, width=width,
                                     seed = seed)
                 elif option_function == "Fix Style":
-                    output = gen_controlnet(pipe_controlnet, 
+                    pipe = load_controlnet_model("../checkpoints/Interior.safetensors")
+                    pipe.load_lora_weights("../checkpoints", weight_name="Interior_lora.safetensors")
+                    pipe.fuse_lora(lora_scale=0.7)
+                    output = gen_controlnet(pipe, 
                                         prompt, trigger_words="", 
                                         neg=negative_prompt, 
                                         num_images=num_outputs, 
@@ -144,7 +150,8 @@ def main():
                     image_inpainting = Image.fromarray(np.array(image_inpainting))
                     mask = mask.convert("RGB")
                     
-                    output = inpaint_gen(pipe_inpaint,
+                    pipe = load_model_inpaint("../checkpoints/Interior.safetensors")
+                    output = inpaint_gen(pipe,
                                         image_inpainting,
                                         mask,
                                         prompt,
@@ -172,14 +179,5 @@ def main():
     
 
 if __name__ == "__main__":
-    pipe_base = load_model_base("../checkpoints/Interior.safetensors")
-    pipe_base.load_lora_weights("../checkpoints", weight_name="Interior_lora.safetensors")
-    pipe_base.fuse_lora(lora_scale=0.7)
-    
-    pipe_controlnet = load_controlnet_model("../checkpoints/Interior.safetensors")
-    pipe_controlnet.load_lora_weights("../checkpoints", weight_name="Interior_lora.safetensors")
-    pipe_controlnet.fuse_lora(lora_scale=0.7)
-    
-    pipe_inpaint = load_model_inpaint("../checkpoints/Interior.safetensors")
     
     main()
