@@ -2,8 +2,10 @@
 <h1> Interior-stable-difusion: Revolutionizing Interior Design with Rapid Visualization and Customization
 </div>
 
-<div align="center">
-  <img src="assets/image_grid.png" >
+<div style="display: flex; justify-content: center; flex-wrap: nowrap; overflow-x: auto;">
+  <img src="assets/gr11.png" style="flex: 0 0 auto; width: 32%;">
+  <img src="assets/inp1.png" style="flex: 0 0 auto; width: 32%;">
+  <img src="assets/con3.png" style="flex: 0 0 auto; width: 32%;">
 </div>
 
 The evolution of AI technologies like Stable Diffusion(https://arxiv.org/abs/2112.10752) has revolutionized visual design. Now, with "Interior-Stable-Diffusion," this technology is tailored for interior design, enabling rapid generation, style modification, and object replacement in interior spaces. This application empowers designers to visualize and refine spaces with unprecedented speed and precision, transforming ideas into reality in moments.
