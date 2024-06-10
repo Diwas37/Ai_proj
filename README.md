@@ -3,7 +3,7 @@
 </div>
 
 <div style="display: flex; justify-content: center; flex-wrap: nowrap; overflow-x: auto;">
-  <img src="assets/gr11.png" style="flex: 0 0 auto; width: 32%;">
+  <img src="assets/gr1.png" style="flex: 0 0 auto; width: 32%;">
   <img src="assets/inp1.png" style="flex: 0 0 auto; width: 32%;">
   <img src="assets/con3.png" style="flex: 0 0 auto; width: 32%;">
 </div>
