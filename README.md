@@ -9,43 +9,43 @@ Using Stable Diffusion, this app can make desirable images with three main funct
 - Fixing style: Utilize the [Controlnet Canny](https://huggingface.co/lllyasviel/sd-controlnet-canny) echnique to maintain the original image’s edges while introducing a new style based on the canny edge map.
 - Replacing object: using [ControlnetInpaintPipeline](https://huggingface.co/docs/diffusers/en/api/pipelines/controlnet#diffusers.StableDiffusionControlNetInpaintPipeline) to seamlessly replace objects within specified masked areas of an image.
 ## Examples
-<p align="center">
-  <img src="assets/prompt1.png" style="display: inline;">
-  <img src="assets/prompt2.png" style="display: inline;">
-</p>
+### General generation
+<div style="display: flex; justify-content: center; flex-wrap: nowrap; overflow-x: auto;">
+  <img src="assets/prompt1.png" style="flex: 0 0 auto; width: 48%;">
+  <img src="assets/prompt2.png" style="flex: 0 0 auto; width: 48%;">
+</div>
 <p align="center">Prompt: A living room with a TV, wooden floor, a sofa, a nice glass table and a flower in the table</p>
-<p align="center">
-  <img src="assets/prompt3.png" style="display: inline;">
-  <img src="assets/prompt4.png" style="display: inline;">
-</p>
+<div style="display: flex; justify-content: center; flex-wrap: nowrap; overflow-x: auto;">
+  <img src="assets/prompt3.png" style="flex: 0 0 auto; width: 48%;">
+  <img src="assets/prompt4.png" style="flex: 0 0 auto; width: 48%;">
+</div>
 <p align="center">Prompt: A large modern kitchen with light grey, brown and white, large kitchen cabinets</p>
 
-<!-- Fixing style section -->
-<h3 align="center">Fixing style</h3>
-<p align="center">
-  <img src="assets/con1.png" style="display: inline;">
-  <img src="assets/con2.png" style="display: inline;">
-</p>
+
+### Fixing style
+<div style="display: flex; justify-content: center; flex-wrap: nowrap; overflow-x: auto;">
+  <img src="assets/con1.png" style="flex: 0 0 auto; width: 48%;">
+  <img src="assets/con2.png" style="flex: 0 0 auto; width: 48%;">
+</div>
 <p align="center">Change: A black table</p>
-<p align="center">
-  <img src="assets/con3.png" style="display: inline;">
-  <img src="assets/con4.png" style="display: inline;">
-</p>
+<div style="display: flex; justify-content: center; flex-wrap: nowrap; overflow-x: auto;">
+  <img src="assets/con3.png" style="flex: 0 0 auto; width: 48%;">
+  <img src="assets/con4.png" style="flex: 0 0 auto; width: 48%;">
+</div>
 <p align="center">Change: A colorful violet chandelier, darker ceiling.</p>
 
-<!-- Replacing object section -->
-<h3 align="center">Replacing object</h3>
-<p align="center">
-  <img src="assets/inp1.png" style="display: inline;">
-  <img src="assets/inp2.png" style="display: inline;">
-  <img src="assets/inp3.png" style="display: inline;">
-</p>
+### Replacing object
+<div style="display: flex; justify-content: center; flex-wrap: nowrap; overflow-x: auto;">
+  <img src="assets/inp1.png" style="flex: 0 0 auto; width: 32%;">
+  <img src="assets/inp2.png" style="flex: 0 0 auto; width: 32%;">
+  <img src="assets/inp3.png" style="flex: 0 0 auto; width: 32%;">
+</div>
 <p align="center">Prompt: a luxury liquor cabinet</p>
-<p align="center">
-  <img src="assets/inp4.png" style="display: inline;">
-  <img src="assets/inp5.png" style="display: inline;">
-  <img src="assets/inp6.png" style="display: inline;">
-</p>
+<div style="display: flex; justify-content: center; flex-wrap: nowrap; overflow-x: auto;">
+  <img src="assets/inp4.png" style="flex: 0 0 auto; width: 32%;">
+  <img src="assets/inp5.png" style="flex: 0 0 auto; width: 32%;">
+  <img src="assets/inp6.png" style="flex: 0 0 auto; width: 32%;">
+</div>
 <p align="center">Prompt: a fridge</p>
 
 ## Installation and Usage
