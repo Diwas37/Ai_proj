@@ -6,5 +6,3 @@ checkpoints/
 *.bin
 *.pth
 
-*.png
-*.jpg
