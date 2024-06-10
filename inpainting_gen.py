@@ -52,7 +52,7 @@ def inpaint_gen(pipe,
                 neg="", 
                 seed=43, 
                 num_images=1, 
-                num_infer_steps=40, 
+                num_infer_steps=35, 
                 height=512, 
                 width=512):
     neg += " soft line, curved line, sketch, ugly, logo, pixelated, lowres, text, word, cropped, low quality, normal quality, username, watermark, signature, blurry, soft"

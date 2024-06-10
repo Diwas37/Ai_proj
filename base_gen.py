@@ -18,7 +18,7 @@ def gen_base(pipe,
                  neg="", 
                  seed=42, 
                  num_images=1, 
-                 num_infer_steps=45, 
+                 num_infer_steps=35, 
                  height=768, 
                  width=1024):
     

@@ -40,7 +40,7 @@ def main():
         "Choose a function", ["Generate", "Fix Style", "Replace object"], index=0)
 
     #take image control
-    if option_function == "Fixing Style":
+    if option_function == "Fix Style":
         image_controlnet = st.file_uploader("Upload image", type=["jpg", "jpeg", "png"])
         if image_controlnet is not None:
             image_controlnet = Image.open(image_controlnet)
@@ -54,11 +54,11 @@ def main():
         
         if image_inpainting is not None:
             image_inpainting = Image.open(image_inpainting)
-            h, w = image_inpainting.size
+            w, h = image_inpainting.size
             
             fill_color = "rgba(255, 255, 255, 0.0)"
             stroke_width = st.number_input("Brush Size",
-                                        value=50,
+                                        value=40,
                                         min_value=1,
                                         max_value=100)
             stroke_color = "rgba(255, 255, 255, 1.0)"
@@ -66,7 +66,7 @@ def main():
             drawing_mode = "freedraw"
             
             st.caption(
-                "Draw a mask to inpaint, then click the 'Send to Streamlit' button (bottom left, with an arrow on it).")
+                "Draw a mask to repalce object, then click the 'Send to Streamlit' button (bottom left, with an arrow on it).")
             canvas_result = st_canvas(
                 fill_color=fill_color,
                 stroke_width=stroke_width,
@@ -103,8 +103,8 @@ def main():
             st.divider()
             num_outputs = st.slider(
                 "Number of images to output", value=1, min_value=1, max_value=4)
-            width = st.number_input("Width of output image", value=512)
-            height = st.number_input("Height of output image", value=512)
+            width = st.number_input("Width of output image", value=1024)
+            height = st.number_input("Height of output image", value=768)
 
             # The Big Red "Submit" Button!
             submitted = st.form_submit_button(
