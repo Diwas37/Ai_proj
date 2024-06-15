@@ -47,13 +47,13 @@ Using Stable Diffusion, this app can make desirable images with three main funct
   <img src="assets/inp2.png" style="flex: 0 0 auto; width: 32%;">
   <img src="assets/inp3.png" style="flex: 0 0 auto; width: 32%;">
 </div>
-<p align="center">Prompt: a luxury liquor cabinet</p>
+<p align="center">Prompt: a fridge</p>
 <div style="display: flex; justify-content: center; flex-wrap: nowrap; overflow-x: auto;">
   <img src="assets/inp4.png" style="flex: 0 0 auto; width: 32%;">
   <img src="assets/inp5.png" style="flex: 0 0 auto; width: 32%;">
   <img src="assets/inp6.png" style="flex: 0 0 auto; width: 32%;">
 </div>
-<p align="center">Prompt: a fridge</p>
+<p align="center">Prompt: a luxury liquor cabinet</p>
 
 ## Installation and Usage
 ### Environment setup
