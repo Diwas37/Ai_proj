@@ -75,7 +75,8 @@ Using Stable Diffusion, this app can generate desirable interior images with thr
 ### Environment Setup
 
 ```bash
-python3 -m venv .env
+brew install python@3.11
+python3.11 -m venv .env
 source .env/bin/activate
 
 git clone https://github.com/Diwas37/Ai_proj.git
