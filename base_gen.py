@@ -5,7 +5,10 @@ from utils_func import create_scheduler
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 def load_model_base(model_path: str):
-    pipe = StableDiffusionPipeline.from_single_file(model_path).to(device)
+    if device == "cuda":
+        pipe = StableDiffusionPipeline.from_single_file(model_path, torch_dtype=torch.float16).to(device)
+    else:
+        pipe = StableDiffusionPipeline.from_single_file(model_path).to(device)
 
     # pipe.load_lora_weights("TrgTuan10/Interior", weight_name="xsarchitectural-7.safetensors", adapter_name="architecture")
     # trigger_words = " ,VERRIERES, DAYLIGHTINDIRECT, LIGHTINGAD, MAGAZINE8K, CINEMATIC LIGHTING, EPIC COMPOSITION"

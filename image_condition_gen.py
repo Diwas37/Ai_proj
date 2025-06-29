@@ -6,17 +6,23 @@ from PIL import Image
 import numpy as np
 
 def load_controlnet_model(model_path: str):
+    device = "cuda" if torch.cuda.is_available() else "cpu"
     controlnet = ControlNetModel.from_pretrained(
-        "lllyasviel/sd-controlnet-canny", torch_dtype=torch.float16
+        "lllyasviel/sd-controlnet-canny", torch_dtype=torch.float16 if device=="cuda" else None
     )
-    
-    pipe_controlnet = StableDiffusionControlNetPipeline.from_single_file(
-        model_path,
-        controlnet=controlnet, 
-        safety_checker=None,
-        torch_dtype=torch.float16
-    ).to("cuda")
-    
+    if device == "cuda":
+        pipe_controlnet = StableDiffusionControlNetPipeline.from_single_file(
+            model_path,
+            controlnet=controlnet, 
+            safety_checker=None,
+            torch_dtype=torch.float16
+        ).to(device)
+    else:
+        pipe_controlnet = StableDiffusionControlNetPipeline.from_single_file(
+            model_path,
+            controlnet=controlnet, 
+            safety_checker=None
+        ).to(device)
     return pipe_controlnet
 
 def preprocessor_image(image):
@@ -48,7 +54,8 @@ def gen_controlnet(pipe_controlnet,
     scheduler = create_scheduler()
     image_control = preprocessor_image(image)
     # image_control.save("control.jpg")
-    generator = torch.Generator(device="cuda").manual_seed(seed)
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    generator = torch.Generator(device=device).manual_seed(seed)
     
     images = pipe_controlnet(
         prompt=prompt, 
@@ -74,6 +81,6 @@ if __name__ == "__main__":
     image = images[0]
     image.save("interior_control.jpg")
     print("Image saved as interior_control.jpg")
-    
-                            
-                            
+
+
+
