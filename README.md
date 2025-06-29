@@ -79,7 +79,7 @@ python3 -m venv .env
 source .env/bin/activate
 
 git clone https://github.com/Diwas37/Ai_proj.git
-cd Ai_proj/Interior-stable-difusion
+cd Ai_proj
 pip install -r requirements.txt
 ```
 
