@@ -1,5 +1,5 @@
 <div align="center">
-<h1> Interior-stable-difusion: Revolutionizing Interior Design with Rapid Visualization and Customization </h1>
+<h1> AI-Styled Spaces: Dynamic Interior Redesign with Stable Diffusion </h1>
 </div>
 
 <div style="display: flex; justify-content: center; flex-wrap: nowrap; overflow-x: auto;">
